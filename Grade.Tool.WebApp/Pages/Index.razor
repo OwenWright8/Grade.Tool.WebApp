@@ -1,0 +1,172 @@
+﻿
+@page "/"
+
+<style>
+    .header {
+        background-color: #2f2f2f;
+        color: white;
+        padding: 20px;
+        text-align: center;
+        font-size: 36px;
+        font-weight: bold;
+    }
+
+    form {
+        padding: 20px;
+        background-color: #f2f2f2;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        margin: 20px;
+    }
+
+        form label {
+            font-size: 18px;
+            font-weight: bold;
+            margin-right: 20px;
+        }
+
+        form input[type="text"], select {
+            padding: 10px;
+            font-size: 18px;
+            width: 300px;
+            margin-bottom: 20px;
+        }
+
+        form button[type="button"] {
+            background-color: #2f2f2f;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+            form button[type="button"]:hover {
+                background-color: #ccc;
+                color: black;
+            }
+
+    .result {
+        background-color: #f2f2f2;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        margin: 20px;
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: Arial, sans-serif;
+    }
+
+    th {
+        background-color: #dddddd;
+        text-align: left;
+        padding: 8px;
+        border-bottom: 1px solid black;
+    }
+
+    td {
+        border-bottom: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+</style>
+
+<h1 class="header">Lowest Score Calculator</h1>
+
+<form>
+    <div class="form-group">
+        <label for="className">Class Name:</label>
+        <input type="text" class="form-control" id="className" @bind-value="classInformation.ClassName" />
+    </div>
+
+    <div class="form-group">
+        <label for="q1Grade">Quarter One Grade:</label>
+        <input type="text" class="form-control" id="q1Grade" @bind-value="classInformation.Q1Grade" />
+    </div>
+
+    <div class="form-group">
+        <label for="q2Grade">Quarter Two Grade:</label>
+        <input type="text" class="form-control" id="q2Grade" @bind-value="classInformation.Q2Grade" />
+    </div>
+
+    <div class="form-group">
+        <label for="finalPercent">Final Exam Percentage:</label>
+        <input type="text" class="form-control" id="finalPercent" @bind-value="finalPercent" />
+    </div>
+
+    <div class="form-group">
+        <label for="wantedGrade">Lowest Score Wanted:</label>
+        <input type="text" class="form-control" id="wantedGrade" @bind-value="wantedGrade" />
+    </div>
+
+    <button type="button" class="btn btn-primary" @onclick="CalculateLowestScore">Calculate</button>
+</form>
+
+<br />
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Class Name</th>
+            <th>Quarter One</th>
+            <th>Quarter Two</th>
+            <th>Lowest Final Score</th>
+            <th>Semester Grade</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var classInformation in classInformations)
+        {
+            <tr>
+                <td>@classInformation.ClassName</td>
+                <td>@classInformation.Q1Grade</td>
+                <td>@classInformation.Q2Grade</td>
+                <td>@classInformation.LowestFinalScore</td>
+                <td>@wantedGrade</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+
+    private ClassInformation classInformation = new ClassInformation();
+    private List<ClassInformation> classInformations = new List<ClassInformation>();
+    private readonly IMongoCollection<ClassInformation> _classInformation;
+    private double finalPercent;
+    private double wantedGrade;
+
+    private void CalculateLowestScore()
+    {
+        double average = (classInformation.Q1Grade + classInformation.Q2Grade) / 2;
+        double remainingPercent = 1 - (finalPercent / 100);
+        double lowestFinalScore = (wantedGrade - (average * remainingPercent)) / (finalPercent / 100);
+
+        classInformation.LowestFinalScore = Convert.ToInt32(Math.Ceiling(lowestFinalScore));
+        classInformations.Add(classInformation);
+
+        classInformation = new ClassInformation();
+    }
+
+    public class ClassInformation
+    {
+        public string ClassName { get; set; }
+        public int Q1Grade { get; set; }
+        public int Q2Grade { get; set; }
+        public double FinalWeight { get; set; }
+        public int LowestFinalScore { get; set; }
+        public double FinalScore { get; set; } = -1;
+        
+    }
+}
