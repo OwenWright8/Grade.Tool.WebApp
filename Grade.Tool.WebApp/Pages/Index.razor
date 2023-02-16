@@ -1,7 +1,9 @@
 ﻿
 @page "/"
 
+
 <style>
+    /*These are the styles for the web app*/
     .header {
         background-color: #2f2f2f;
         color: white;
@@ -81,6 +83,7 @@
         background-color: #f2f2f2;
     }
 </style>
+<!--This is the html code for the web app-->
 
 <h1 class="header">Lowest Score Calculator</h1>
 
@@ -141,11 +144,14 @@
 
 @code {
 
+    //This initializes the variables
+
     private ClassInformation classInformation = new ClassInformation();
     private List<ClassInformation> classInformations = new List<ClassInformation>();
-    private readonly IMongoCollection<ClassInformation> _classInformation;
     private double finalPercent;
     private double wantedGrade;
+
+    //This calculates the lowest score
 
     private void CalculateLowestScore()
     {
@@ -158,6 +164,8 @@
 
         classInformation = new ClassInformation();
     }
+
+    //This gets and sets all of the data to the variables
 
     public class ClassInformation
     {
